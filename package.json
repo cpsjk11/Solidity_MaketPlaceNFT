@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "zeppelin-solidity": "^1.12.0"
+  },
+  "devDependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1"
+  }
+}
