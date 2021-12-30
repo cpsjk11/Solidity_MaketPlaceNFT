@@ -15,7 +15,7 @@ contract Auctions{
         bool finalized; // 판매 종류여부
     }
     Auction[] public auction;
-    // uiny[] 인 이유는 한 판매자가 여러개의 제품을 올릴 수 있기 때문에 배열로 준비를 한다.
+    // uint[] 인 이유는 한 판매자가 여러개의 제품을 올릴 수 있기 때문에 배열로 준비를 한다.
     mapping(address => uint[]) public auctionOwner; // 각 소유자 어드레스가 가지고 있는 tokenID의 배열에 대한 매핑이다.
 
     function() public{
