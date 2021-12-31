@@ -22,10 +22,14 @@ contract Auctions{
         revert();
     }
 
+    // 이벤트 부분
+    event AuctionCreated(address _owner, uint _auctionId);
+    event AuctionFinalized(address _owner, uint _auctionId);
+
     // 해당 컨트랙트가 특정 NFT 소유권을 가지고 있는지 확인하는 modifier를 정의하자!
     modifier checkNFT(address _repoAddress, uint256 _tokenId){
         // 이 함수는 아까 정의해둔 스마트 컨트랙에서 해당 NFT의 소유자를 반환하는 함수이다.
-        address nftowner = Maket(_repoAddress).onwerOf(_tokenId);
+        address nftowner = Maket(_repoAddress).ownerOf(_tokenId);
         // NFT 소유자가 아닐 시 에러 발생!!🔥🔥
         require(nftowner == address(this));
         _; // modifier을 사용하는 함수는 여기서 부터 시작된다.
@@ -53,10 +57,10 @@ contract Auctions{
 
     // 판매
     function finalizeAuction(uint _auctionId, address _to) public{
-        Auction memory myAuction = auction[__auctionId]; // 구매하고 싶은 상품의 번호를 가져와 생성한다.
+        Auction memory myAuction = auction[_auctionId]; // 구매하고 싶은 상품의 번호를 가져와 생성한다.
 
         // 성공적으로 토큰의 전송 권한을 부여 후 NFT토큰을 보냈을 때만 수행하는 곳 이다.
-        if(approveAndTransfer(address(this), _to, myAction.repoAddress,myAction.tokenId)){
+        if(approveAndTransfer(address(this), _to, myAuction.repoAddress, myAuction.tokenId)){
             auction[_auctionId].active = false; // 판매가 완료 되었으니 활성화 X
             auction[_auctionId].finalized = true; // 그리고 판매 불가능으로 바꾼다.
             emit AuctionFinalized(msg.sender, _auctionId); // 이벤트 발생!
@@ -69,5 +73,47 @@ contract Auctions{
         remoteContract.transferFrom(_from, _to, _tokenId); // 토큰 전송!
         return true;
     }
+
+    // 옥션의 전체갯수를 반환하는 기능
+    // constant : 함수 내부에서 상태변수 값을 변경시지 않겠다는 의미입니다 그리고 해당 함수를 호출할 때는 트랜잭션이 발생하지 않습니다
+    function getCount() public constant returns(uint){
+        return auction.length;
+    }
+
+    // 해당 상품의 소유자의 옥션 리스트를 반환하는 기능
+    function getAuctionsOf(address _owner) public constant returns(uint[]){
+        uint[] memory ownedAuctions = auctionOwner[_owner];
+        return ownedAuctions;
+    }
+    // 해당 상품의 소유자의 옥션 리스트의 갯수를 반환하는 기능
+    function getAuctionsCountOfOwner(address _owner) public constant returns(uint){
+        return auctionOwner[_owner].length;
+    }
+
+    // 옥션 아이디 값으로 상품 전체정보 가져오는 기능
+    function getAuctionById(uint _auctionId) public constant returns(
+                                                                        string name,
+                                                                        uint256 price,
+                                                                        string metadata,
+                                                                        uint256 tokenId,
+                                                                        address repoAddress,
+                                                                        address owner,
+                                                                        bool active,
+                                                                        bool finalized){
+        Auction memory auc = auction[_auctionId];
+        return(
+            auc.name,
+            auc.price,
+            auc.metadata,
+            auc.tokenId,
+            auc.repoAddress,
+            auc.owner,
+            auc.active,
+            auc.finalized
+        );
+    }
+    
+
+
 
 }
