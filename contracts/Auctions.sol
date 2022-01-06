@@ -56,6 +56,31 @@ contract Auctions{
     }
 
     // 판매
+    function sale(uint _auctionId) public payable {
+        Auction memory saleAuction = auction[_auctionId];
+        address  admin = 0xc25a973AA1D89d6A3944E35e7D5Db152da7d17e2;
+        address  user = saleAuction.owner;
+        uint256 price = saleAuction.price;
+        uint256 fee = price/10; // 수수료는 10%로 잡았다.
+        uint256 amountWithoutFee = price - fee;
+
+        // 판매되는 상품의 금액과 구매자 보낸 금액을 비교해 같지 않으면 에러를 발생시키자!
+        require(msg.value == price,"the amount is wrong");
+
+        // 금액을 받고 관리자 한테 수수료를 보내고 남은 잔액은 소유자에게 보낸다.
+
+        // 관리자에게 수수료 넘기기
+        admin.send(fee);
+        // 소유자에게 잔약 보내기
+        user.send(amountWithoutFee);
+
+        // 이제 구매자 한테 NFT를 전송하자~!
+        finalizeAuction(_auctionId,msg.sender);
+
+        
+    }
+
+    // 소유권 이전
     function finalizeAuction(uint _auctionId, address _to) public{
         Auction memory myAuction = auction[_auctionId]; // 구매하고 싶은 상품의 번호를 가져와 생성한다.
 
